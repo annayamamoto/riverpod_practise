@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:riverpod_practise/data/count_data.dart';
 import 'package:riverpod_practise/provider.dart';
+import 'package:riverpod_practise/view_model.dart';
 
 void main() {
   runApp(const ProviderScope(child: MyApp()));
@@ -31,9 +31,17 @@ class MyHomePage extends ConsumerStatefulWidget {
 }
 
 class _MyHomePageState extends ConsumerState<MyHomePage> {
+  final ViewModel _viewModel = ViewModel();
+
+  @override
+  void initState() {
+    super.initState();
+
+    _viewModel.setRef(ref);
+  }
+
   @override
   Widget build(BuildContext context) {
-    print('MyHomePage rebuild');
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
@@ -47,7 +55,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
               ref.watch(bodyTextProvider),
             ),
             Text(
-              ref.watch(countDataProvider).count.toString(),
+              _viewModel.count,
               style: Theme.of(context).textTheme.headlineMedium,
             ),
             const SizedBox(height: 10),
@@ -56,23 +64,13 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
               children: [
                 FloatingActionButton(
                   onPressed: () {
-                    CountData countData =
-                        ref.read(countDataProvider.notifier).state;
-                    ref.read(countDataProvider.notifier).state =
-                        countData.copyWith(
-                            count: countData.count + 1,
-                            countUp: countData.countUp + 1);
+                    _viewModel.onIncrease();
                   },
                   child: const Icon(Icons.add),
                 ),
                 FloatingActionButton(
                   onPressed: () {
-                    CountData countData =
-                        ref.read(countDataProvider.notifier).state;
-                    ref.read(countDataProvider.notifier).state =
-                        countData.copyWith(
-                            count: countData.count - 1,
-                            countDown: countData.countDown + 1);
+                    _viewModel.onDecrease();
                   },
                   child: const Icon(Icons.horizontal_rule),
                 ),
@@ -84,12 +82,8 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                Text(ref
-                    .watch(countDataProvider.select((value) => value.countUp))
-                    .toString()),
-                Text(ref
-                    .watch(countDataProvider.select((value) => value.countDown))
-                    .toString()),
+                Text(_viewModel.countUp),
+                Text(_viewModel.countDown),
               ],
             )
           ],
@@ -97,8 +91,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          ref.read(countDataProvider.notifier).state =
-              const CountData(count: 0, countDown: 0, countUp: 0);
+          _viewModel.onReset();
         },
         child: const Icon(Icons.refresh),
       ),
