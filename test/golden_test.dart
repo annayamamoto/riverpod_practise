@@ -48,11 +48,11 @@ void main() {
     final mockMessageProvider = Provider<String>((ref) => 'mockMessage');
 
     await tester.pumpWidgetBuilder(ProviderScope(
-      child: MyHomePage(mock),
       overrides: [
         // titleProvider.overrideWithProvider(mockTitleProvider),
         mockMessageProvider.overrideWithValue('mockMessage'),
       ],
+      child: MyHomePage(mock),
     ));
 
     await multiScreenGolden(tester, 'myHomePage_mock', devices: devices);
