@@ -1,7 +1,8 @@
 import 'package:audioplayers/audioplayers.dart';
 import 'package:riverpod_practise/data/count_data.dart';
+import 'package:riverpod_practise/logic/count_data_changed_notifier.dart';
 
-class SoundLogic {
+class SoundLogic extends CountDataChangedNotifier {
   static const soundDataUp = 'assets/sounds/bo-tto hidamari.mp3';
   static const soundDataDown = 'assets/sounds/husigityan o-ra.mp3';
   static const soundDataReset = 'assets/sounds/komorebi no nakade.mp3';
