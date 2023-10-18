@@ -11,6 +11,8 @@ class ViewModel {
   final Logic _logic = Logic();
   final SoundLogic _soundLogic = SoundLogic();
   late ButtonAnimationLogic _buttonAnimationLogicPlus;
+  late ButtonAnimationLogic _buttonAnimationLogicMinus;
+  late ButtonAnimationLogic _buttonAnimationLogicReset;
 
   late WidgetRef _ref;
 
@@ -19,9 +21,28 @@ class ViewModel {
   void setRef(WidgetRef ref, TickerProvider tickerProvider) {
     _ref = ref;
 
-    _buttonAnimationLogicPlus = ButtonAnimationLogic(tickerProvider);
+    conditionPlus(CountData oldValue, CountData newValue) {
+      return oldValue.countUp + 1 == newValue.countUp;
+    }
 
-    notifiers = [_soundLogic, _buttonAnimationLogicPlus];
+    _buttonAnimationLogicPlus =
+        ButtonAnimationLogic(tickerProvider, conditionPlus);
+
+    _buttonAnimationLogicMinus =
+        ButtonAnimationLogic(tickerProvider, (oldValue, newValue) {
+      return oldValue.countDown + 1 == newValue.countDown;
+    });
+    _buttonAnimationLogicReset = ButtonAnimationLogic(
+      tickerProvider,
+      (oldValue, newValue) => newValue.countUp == 0 && newValue.countDown == 0,
+    );
+
+    notifiers = [
+      _soundLogic,
+      _buttonAnimationLogicPlus,
+      _buttonAnimationLogicMinus,
+      _buttonAnimationLogicReset
+    ];
   }
 
   get count => _ref.watch(countDataProvider).count.toString();
@@ -33,7 +54,14 @@ class ViewModel {
       .watch(countDataProvider.select((value) => value.countDown))
       .toString();
 
-  get animationPlus => _buttonAnimationLogicPlus.animationScale;
+  get animationPlusCombination =>
+      _buttonAnimationLogicPlus.animationCombination;
+
+  get animationMinusCombination =>
+      _buttonAnimationLogicMinus.animationCombination;
+
+  get animationResetCombination =>
+      _buttonAnimationLogicReset.animationCombination;
 
   void onIncrease() {
     _logic.increase();
@@ -57,6 +85,8 @@ class ViewModel {
     _ref.read(countDataProvider.notifier).state = _logic.countDate;
     CountData newValue = _ref.watch(countDataProvider);
 
-    notifiers.forEach((element) => element.valueChanged(oldValue, newValue));
+    for (var element in notifiers) {
+      element.valueChanged(oldValue, newValue);
+    }
   }
 }

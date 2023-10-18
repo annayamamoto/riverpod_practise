@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod_practise/logic/button_animation_logic.dart';
 import 'package:riverpod_practise/provider.dart';
 import 'package:riverpod_practise/view_model.dart';
 
@@ -72,15 +73,19 @@ class _MyHomePageState extends ConsumerState<MyHomePage>
                   onPressed: () {
                     _viewModel.onIncrease();
                   },
-                  child: ScaleTransition(
-                      scale: _viewModel.animationPlus,
-                      child: const Icon(Icons.add)),
+                  child: ButtonAnimation(
+                    animationCombination: _viewModel.animationPlusCombination,
+                    child: const Icon(Icons.add),
+                  ),
                 ),
                 FloatingActionButton(
                   onPressed: () {
                     _viewModel.onDecrease();
                   },
-                  child: const Icon(Icons.horizontal_rule),
+                  child: ButtonAnimation(
+                      animationCombination:
+                          _viewModel.animationMinusCombination,
+                      child: const Icon(Icons.horizontal_rule)),
                 ),
               ],
             ),
@@ -101,8 +106,29 @@ class _MyHomePageState extends ConsumerState<MyHomePage>
         onPressed: () {
           _viewModel.onReset();
         },
-        child: const Icon(Icons.refresh),
+        child: ButtonAnimation(
+            animationCombination: _viewModel.animationResetCombination,
+            child: const Icon(Icons.refresh)),
       ),
     );
+  }
+}
+
+class ButtonAnimation extends StatelessWidget {
+  final AnimationCombination animationCombination;
+  final Widget child;
+
+  const ButtonAnimation({
+    super.key,
+    required this.animationCombination,
+    required this.child,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ScaleTransition(
+        scale: animationCombination.animationScale,
+        child: RotationTransition(
+            turns: animationCombination.animationRotation, child: child));
   }
 }
