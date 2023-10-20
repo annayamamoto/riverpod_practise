@@ -4,6 +4,7 @@ import 'package:riverpod_practise/data/count_data.dart';
 import 'package:riverpod_practise/logic/button_animation_logic.dart';
 import 'package:riverpod_practise/logic/count_data_changed_notifier.dart';
 import 'package:riverpod_practise/logic/logic.dart';
+import 'package:riverpod_practise/logic/shared_preferences_logic.dart';
 import 'package:riverpod_practise/logic/sound_logic.dart';
 import 'package:riverpod_practise/provider.dart';
 
@@ -41,8 +42,14 @@ class ViewModel {
       _soundLogic,
       _buttonAnimationLogicPlus,
       _buttonAnimationLogicMinus,
-      _buttonAnimationLogicReset
+      _buttonAnimationLogicReset,
+      SharedPreferencesLogic(),
     ];
+
+    SharedPreferencesLogic.read().then((value) {
+      _logic.init(value);
+      update();
+    });
   }
 
   get count => _ref.watch(countDataProvider).count.toString();
